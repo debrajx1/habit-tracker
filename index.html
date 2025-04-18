@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Habit Tracker Pro</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="icons/icon-192.png" type="image/png">
+  <meta name="theme-color" content="#2d2d2d" />
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+<body>
+  <header>
+    <h1>Habit Tracker Pro</h1>
+    <button id="theme-toggle">Toggle Theme</button>
+  </header>
+
+  <main>
+    <!-- Habit Creation Form -->
+    <section class="habit-form">
+      <input type="text" id="habit-name" placeholder="Habit Name" />
+      <input type="text" id="habit-category" placeholder="Category (e.g. Fitness)" />
+      <select id="habit-difficulty">
+        <option value="Easy">Easy</option>
+        <option value="Medium" selected>Medium</option>
+        <option value="Hard">Hard</option>
+      </select>
+      <input type="time" id="habit-reminder" />
+      <label>
+        <input type="checkbox" id="habit-mute" /> Mute Reminder
+      </label>
+      <button id="add-habit">Add Habit</button>
+    </section>
+
+    <!-- Habit Cards Will Be Injected Here -->
+    <section id="habits-list"></section>
+
+        <!-- Streak Summary -->
+        <section class="streak-section">
+          <h2>Your Streaks 🔥</h2>
+          <div id="streak-display"></div>
+        </section>
+
+      <!-- Chart Section -->
+      <section class="chart-section">
+        <h2>Progress & Streak Visuals 📊</h2>
+        <canvas id="progress-chart" width="400" height="200"></canvas>
+        <canvas id="completion-rate-chart" width="400" height="200"></canvas>
+        <canvas id="weekly-consistency-chart" width="400" height="200"></canvas>
+        <canvas id="longest-streak-chart" width="400" height="200"></canvas>
+      </section>
+
+      <section class="achievement-section">
+        <h2>🏆 Achievements</h2>
+        <div id="achievements" class="achievement-grid">
+          <!-- Achievements will appear here -->
+        </div>
+      </section>
+      
+
+    <!-- Export & Import -->
+    <div class="data-controls">
+      <button id="export-data">Export</button>
+      <label for="import-data" class="file-label">Choose File</label>
+      <input type="file" id="import-data" />
+    </div>
+  </main>
+
+  <footer>
+    <p>Created by Mephisto X ~ Student | Licensed under D&M Company</p>
+  </footer>
+
+  <script type="module" src="js/main.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('Service Worker Registered', reg))
+        .catch(err => console.error('Service Worker Failed', err));
+    }
+  </script>
+</body>
+</html>

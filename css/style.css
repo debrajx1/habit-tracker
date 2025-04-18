@@ -1,0 +1,359 @@
+/* style.css - Enhanced Professional Styling for Habit Tracker Pro */
+
+:root {
+    --primary-color: #2d89ef;
+    --background-light: #f9f9f9;
+    --background-dark: #121212;
+    --text-light: #ffffff;
+    --text-dark: #1a1a1a;
+    --card-background: #ffffff;
+    --card-dark: #1f1f1f;
+    --accent-color: #00bfa5;
+    --border-radius: 12px;
+    --transition: 0.3s ease-in-out;
+    --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --shadow-dark: 0 4px 12px rgba(255, 255, 255, 0.1);
+  }
+  
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-light);
+    color: var(--text-dark);
+    transition: var(--transition);
+  }
+  
+  body.dark {
+    background-color: var(--background-dark);
+    color: var(--text-light);
+  }
+  
+  header {
+    background-color: var(--primary-color);
+    color: #fff;
+    padding: 1.2rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow-light);
+  }
+  
+  header h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 600;
+  }
+  
+  #theme-toggle {
+    background-color: #fff;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: 500;
+    transition: var(--transition);
+  }
+  
+  #theme-toggle:hover {
+    background-color: var(--accent-color);
+    color: white;
+  }
+  
+  main {
+    padding: 2rem;
+    max-width: 960px;
+    margin: auto;
+  }
+  
+  .habit-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+    background-color: var(--card-background);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+  }
+  
+  body.dark .habit-form {
+    background-color: var(--card-dark);
+    box-shadow: var(--shadow-dark);
+  }
+  
+  .habit-form input,
+  .habit-form select,
+  .habit-form button,
+  .habit-form label {
+    padding: 0.7rem;
+    border: 1px solid #ccc;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+  }
+  
+  .habit-form button {
+    background-color: var(--primary-color);
+    color: white;
+    cursor: pointer;
+    border: none;
+    transition: var(--transition);
+    font-weight: bold;
+  }
+  
+  .habit-form button:hover {
+    background-color: var(--accent-color);
+  }
+  
+  #habits-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .habit {
+    background-color: var(--card-background);
+    padding: 1.2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    transition: var(--transition);
+  }
+  
+  body.dark .habit {
+    background-color: var(--card-dark);
+    box-shadow: var(--shadow-dark);
+  }
+  
+  .habit h3 {
+    margin-top: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+  
+  .habit button {
+    background-color: crimson;
+    color: white;
+    border: none;
+    padding: 0.6rem;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    margin-top: 0.7rem;
+    font-weight: bold;
+    transition: var(--transition);
+  }
+  
+  .habit:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  canvas {
+    display: block;
+    margin: 2rem auto;
+    max-width: 100%;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  body.dark .calendar-container {
+    background-color: var(--card-dark);
+    box-shadow: var(--shadow-dark);
+  }
+  
+  footer {
+    text-align: center;
+    padding: 1.2rem;
+    background-color: #e0e0e0;
+    color: #333;
+    font-size: 0.9rem;
+  }
+  
+  body.dark footer {
+    background-color: #1a1a1a;
+    color: #aaa;
+  }
+  
+  button,
+  input,
+  select {
+    font-family: inherit;
+  }
+  
+  /* Responsive Grids */
+  @media (max-width: 600px) {
+    .habit-form {
+      grid-template-columns: 1fr;
+    }
+  
+    #habits-list {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  /* Export & Import Styling */
+  .data-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    justify-content: flex-start;
+  }
+  
+  #export-data {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color var(--transition);
+  }
+  
+  #export-data:hover {
+    background-color: var(--accent-color);
+  }
+  
+  #import-data {
+    display: none;
+  }
+  
+  .file-label {
+    display: inline-block;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color var(--transition);
+  }
+  
+  .file-label:hover {
+    background-color: var(--accent-color);
+  }
+  
+  body.dark .file-label {
+    background-color: var(--accent-color);
+  }
+  
+  /* Streak Badge */
+  .streak {
+    background-color: var(--accent-color);
+    color: white;
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    border-radius: 50px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+  
+  button:focus {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 3px;
+  }
+  
+  /* Chart Styling */
+  .chart-section h2 {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+  
+  .chart-section canvas {
+    margin: 1rem auto;
+    display: block;
+    max-width: 100%;
+  }
+  
+  .streak-section h2 {
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+  
+  /* Responsive Button Stack (optional) */
+  @media (max-width: 500px) {
+    .data-controls {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  .achievement-section {
+    margin-top: 2rem;
+    text-align: center;
+  }
+  
+  .achievement-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .achievement {
+    background-color: var(--card-background);
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    text-align: center;
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  body.dark .achievement {
+    background-color: var(--card-dark);
+    box-shadow: var(--shadow-dark);
+  }
+  
+  .achievement h3 {
+    margin-bottom: 0.5rem;
+  }
+  
+  .achievement.locked {
+    opacity: 0.4;
+    filter: grayscale(100%);
+  }
+  
+  #achievements {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+    padding: 1rem;
+  }
+  
+  .achievement {
+    background: #fff;
+    padding: 1rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease;
+    text-align: center;
+    height: 160px; /* Fixed height for consistency */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .achievement.locked {
+    background: #f5f5f5;
+    color: #aaa;
+    box-shadow: none;
+  }
+  
+  .achievement h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .achievement.locked h3,
+  .achievement.locked p {
+    color: #aaa;
+  }
+  
+  .achievement:hover {
+    transform: translateY(-4px);
+  }
+  
