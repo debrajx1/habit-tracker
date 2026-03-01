@@ -1,85 +1,626 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Habit Tracker Pro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Habit Tracker Pro — Build Better Habits</title>
+  <meta name="description"
+    content="Professional habit tracking with XP, streaks, analytics, mood tracking, journal, and Pomodoro timer." />
+  <meta name="keywords" content="habit tracker, productivity, streak, goals, daily habits" />
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="css/style.css" />
   <link rel="icon" href="icons/icon-192.png" type="image/png">
-  <meta name="theme-color" content="#2d2d2d" />
-
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="theme-color" content="#6c5ce7" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 </head>
-<body>
-  <header>
-    <h1>Habit Tracker Pro</h1>
-    <button id="theme-toggle">Toggle Theme</button>
-  </header>
 
-  <main>
-    <!-- Habit Creation Form -->
-    <section class="habit-form">
-      <input type="text" id="habit-name" placeholder="Habit Name" />
-      <input type="text" id="habit-category" placeholder="Category (e.g. Fitness)" />
-      <select id="habit-difficulty">
-        <option value="Easy">Easy</option>
-        <option value="Medium" selected>Medium</option>
-        <option value="Hard">Hard</option>
-      </select>
-      <input type="time" id="habit-reminder" />
-      <label>
-        <input type="checkbox" id="habit-mute" /> Mute Reminder
-      </label>
-      <button id="add-habit">Add Habit</button>
+<body>
+
+  <!-- Offline Banner -->
+  <div id="offline-banner" class="offline-banner">📡 You're offline — changes will sync when reconnected</div>
+
+  <!-- PWA Install Banner -->
+  <div id="install-banner" class="install-banner">
+    <div class="install-content">
+      <span>📱 Install Habit Tracker for a better experience!</span>
+      <div class="install-actions">
+        <button id="install-btn" class="btn-primary btn-sm">Install</button>
+        <button id="install-dismiss" class="btn-ghost btn-sm">Later</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <!-- Confetti Canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- ===== ONBOARDING SCREEN ===== -->
+  <div id="onboarding-screen" class="onboarding-screen">
+    <div class="onboarding-container">
+      <div class="onboarding-slides" id="onboarding-slides">
+        <!-- Slide 1 -->
+        <div class="onboarding-slide active" data-slide="0">
+          <div class="onboarding-emoji">🎯</div>
+          <h1>Welcome to Habit Tracker Pro</h1>
+          <p>Build life-changing habits with streaks, gamification, mood tracking, and powerful analytics.</p>
+        </div>
+        <!-- Slide 2 -->
+        <div class="onboarding-slide" data-slide="1">
+          <div class="onboarding-emoji">🔥</div>
+          <h1>Build Streaks & Earn XP</h1>
+          <p>Check-in daily, build streaks, earn XP, level up, and unlock 15+ achievement badges!</p>
+        </div>
+        <!-- Slide 3 -->
+        <div class="onboarding-slide" data-slide="2">
+          <div class="onboarding-emoji">📊</div>
+          <h1>Track Everything</h1>
+          <p>Analytics dashboard, mood tracking, daily journal, Pomodoro timer — all the tools you need.</p>
+        </div>
+        <!-- Slide 4: Quick Setup -->
+        <div class="onboarding-slide" data-slide="3">
+          <div class="onboarding-emoji">🚀</div>
+          <h1>Quick Start</h1>
+          <p>Choose from popular templates or create your own custom habits.</p>
+          <div class="onboarding-name-input">
+            <input type="text" id="onboarding-username" placeholder="What's your name?" maxlength="30" />
+          </div>
+        </div>
+      </div>
+      <div class="onboarding-dots" id="onboarding-dots">
+        <span class="dot active"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      </div>
+      <div class="onboarding-actions">
+        <button id="onboarding-skip" class="btn-ghost">Skip</button>
+        <button id="onboarding-next" class="btn-primary">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SIDEBAR OVERLAY ===== -->
+  <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <span class="logo-icon">🎯</span>
+        <span class="logo-text">Habit Pro</span>
+      </div>
+      <button id="sidebar-close" class="sidebar-close" aria-label="Close sidebar">✕</button>
+    </div>
+    <div class="sidebar-profile" id="sidebar-profile">
+      <div class="profile-avatar" id="profile-avatar">👤</div>
+      <div class="profile-name" id="profile-name">User</div>
+      <div class="profile-level">Level <span id="sidebar-level">1</span></div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-view="dashboard"><span class="nav-icon">📊</span><span
+          class="nav-label">Dashboard</span></button>
+      <button class="nav-item" data-view="habits"><span class="nav-icon">✅</span><span class="nav-label">My
+          Habits</span></button>
+      <button class="nav-item" data-view="templates"><span class="nav-icon">📋</span><span
+          class="nav-label">Templates</span></button>
+      <button class="nav-item" data-view="analytics"><span class="nav-icon">📈</span><span
+          class="nav-label">Analytics</span></button>
+      <button class="nav-item" data-view="journal"><span class="nav-icon">📝</span><span
+          class="nav-label">Journal</span></button>
+      <button class="nav-item" data-view="timer"><span class="nav-icon">⏱️</span><span class="nav-label">Focus
+          Timer</span></button>
+      <button class="nav-item" data-view="achievements"><span class="nav-icon">🏆</span><span
+          class="nav-label">Achievements</span></button>
+      <button class="nav-item" data-view="settings"><span class="nav-icon">⚙️</span><span
+          class="nav-label">Settings</span></button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="xp-display">
+        <div class="xp-bar-container">
+          <div class="xp-bar" id="sidebar-xp-bar" style="width:0%"></div>
+        </div>
+        <div class="xp-text"><span id="sidebar-xp">0</span> / <span id="sidebar-xp-next">100</span> XP</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== APP CONTAINER ===== -->
+  <div class="app-container" id="app-container">
+
+    <!-- Header -->
+    <header class="app-header" id="app-header">
+      <div class="header-left">
+        <button id="menu-toggle" class="menu-btn"
+          aria-label="Open menu"><span></span><span></span><span></span></button>
+        <h1 class="app-title">Habit Tracker Pro</h1>
+      </div>
+      <div class="header-right">
+        <div class="header-search" id="header-search">
+          <input type="text" id="search-input" placeholder="Search habits..." aria-label="Search habits" />
+          <span class="search-icon">🔍</span>
+        </div>
+        <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme"><span class="theme-icon"
+            id="theme-icon">🌙</span></button>
+        <button id="add-habit-btn" class="add-btn" aria-label="Add new habit"><span>+</span></button>
+      </div>
+    </header>
+
+    <!-- ===== DASHBOARD VIEW ===== -->
+    <section id="view-dashboard" class="view active">
+      <!-- Greeting + Quote -->
+      <div class="greeting-section">
+        <div class="greeting-left">
+          <h2 class="greeting-text" id="greeting-text">Good morning!</h2>
+          <p class="greeting-subtitle" id="greeting-date"></p>
+        </div>
+        <div class="streak-fire" id="streak-fire-anim">
+          <span class="fire-emoji">🔥</span>
+          <span class="fire-count" id="best-streak-count">0</span>
+        </div>
+      </div>
+
+      <!-- Motivational Quote -->
+      <div class="quote-card" id="quote-card">
+        <p class="quote-text" id="quote-text">"The secret of getting ahead is getting started."</p>
+        <span class="quote-author" id="quote-author">— Mark Twain</span>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <div class="stat-card stat-card-1">
+          <div class="stat-icon">📋</div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-total">0</div>
+            <div class="stat-label">Habits</div>
+          </div>
+        </div>
+        <div class="stat-card stat-card-2">
+          <div class="stat-icon">🔥</div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-streaks">0</div>
+            <div class="stat-label">Streaks</div>
+          </div>
+        </div>
+        <div class="stat-card stat-card-3">
+          <div class="stat-icon">✅</div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-completion">0%</div>
+            <div class="stat-label">Today</div>
+          </div>
+        </div>
+        <div class="stat-card stat-card-4">
+          <div class="stat-icon">⭐</div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-xp">Lv 1</div>
+            <div class="stat-label">Level</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mood Check-in -->
+      <div class="section-card mood-card">
+        <div class="section-header">
+          <h3>How are you feeling today?</h3>
+        </div>
+        <div class="mood-picker" id="mood-picker">
+          <button class="mood-btn" data-mood="amazing" title="Amazing"><span>😄</span><small>Amazing</small></button>
+          <button class="mood-btn" data-mood="good" title="Good"><span>🙂</span><small>Good</small></button>
+          <button class="mood-btn" data-mood="okay" title="Okay"><span>😐</span><small>Okay</small></button>
+          <button class="mood-btn" data-mood="bad" title="Bad"><span>😔</span><small>Bad</small></button>
+          <button class="mood-btn" data-mood="awful" title="Awful"><span>😢</span><small>Awful</small></button>
+        </div>
+      </div>
+
+      <!-- Today's Habits -->
+      <div class="section-card">
+        <div class="section-header">
+          <h3>Today's Habits</h3>
+          <div class="section-header-actions">
+            <select id="habit-sort" class="sort-select">
+              <option value="default">Default</option>
+              <option value="name">Name</option>
+              <option value="priority">Priority</option>
+              <option value="streak">Streak</option>
+              <option value="incomplete">Incomplete First</option>
+            </select>
+            <div class="filter-tabs" id="category-tabs">
+              <button class="filter-tab active" data-category="all">All</button>
+            </div>
+          </div>
+        </div>
+        <div class="today-progress-bar">
+          <div class="today-progress-fill" id="today-progress-fill" style="width:0%"></div>
+        </div>
+        <div id="today-habits" class="today-habits-grid"></div>
+      </div>
+
+      <!-- Heatmap -->
+      <div class="section-card">
+        <div class="section-header">
+          <h3>Activity Heatmap</h3>
+          <span class="section-badge">Last 16 weeks</span>
+        </div>
+        <div id="heatmap-container" class="heatmap-container">
+          <div class="heatmap-months" id="heatmap-months"></div>
+          <div class="heatmap-grid-wrapper">
+            <div class="heatmap-days"><span>Mon</span><span>Wed</span><span>Fri</span></div>
+            <div class="heatmap-grid" id="heatmap-grid"></div>
+          </div>
+          <div class="heatmap-legend">
+            <span>Less</span>
+            <div class="heatmap-cell level-0"></div>
+            <div class="heatmap-cell level-1"></div>
+            <div class="heatmap-cell level-2"></div>
+            <div class="heatmap-cell level-3"></div>
+            <div class="heatmap-cell level-4"></div>
+            <span>More</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weekly Review Card -->
+      <div class="section-card weekly-review-card" id="weekly-review-card">
+        <div class="section-header">
+          <h3>📅 Weekly Review</h3>
+          <span class="section-badge" id="week-range"></span>
+        </div>
+        <div class="weekly-review-stats" id="weekly-review-stats"></div>
+      </div>
     </section>
 
-    <!-- Habit Cards Will Be Injected Here -->
-    <section id="habits-list"></section>
-
-        <!-- Streak Summary -->
-        <section class="streak-section">
-          <h2>Your Streaks 🔥</h2>
-          <div id="streak-display"></div>
-        </section>
-
-      <!-- Chart Section -->
-      <section class="chart-section">
-        <h2>Progress & Streak Visuals 📊</h2>
-        <canvas id="progress-chart" width="400" height="200"></canvas>
-        <canvas id="completion-rate-chart" width="400" height="200"></canvas>
-        <canvas id="weekly-consistency-chart" width="400" height="200"></canvas>
-        <canvas id="longest-streak-chart" width="400" height="200"></canvas>
-      </section>
-
-      <section class="achievement-section">
-        <h2>🏆 Achievements</h2>
-        <div id="achievements" class="achievement-grid">
-          <!-- Achievements will appear here -->
+    <!-- ===== HABITS VIEW ===== -->
+    <section id="view-habits" class="view">
+      <div class="view-header">
+        <h2>My Habits</h2>
+        <div class="view-actions">
+          <button id="show-archived" class="btn-outline">📦 Archived</button>
         </div>
-      </section>
-      
+      </div>
+      <div id="habits-list" class="habits-grid"></div>
+      <div id="archived-section" class="archived-section" style="display:none;">
+        <h3>Archived Habits</h3>
+        <div id="archived-list" class="habits-grid"></div>
+      </div>
+    </section>
 
-    <!-- Export & Import -->
-    <div class="data-controls">
-      <button id="export-data">Export</button>
-      <label for="import-data" class="file-label">Choose File</label>
-      <input type="file" id="import-data" />
+    <!-- ===== TEMPLATES VIEW ===== -->
+    <section id="view-templates" class="view">
+      <div class="view-header">
+        <h2>Habit Templates</h2>
+        <p class="view-subtitle">Quick-add popular habits with one click</p>
+      </div>
+      <div class="template-categories" id="template-categories"></div>
+      <div class="templates-grid" id="templates-grid"></div>
+    </section>
+
+    <!-- ===== ANALYTICS VIEW ===== -->
+    <section id="view-analytics" class="view">
+      <div class="view-header">
+        <h2>Analytics</h2>
+        <div class="view-actions">
+          <select id="analytics-range" class="sort-select">
+            <option value="7">Last 7 days</option>
+            <option value="30" selected>Last 30 days</option>
+            <option value="90">Last 90 days</option>
+          </select>
+        </div>
+      </div>
+      <!-- Mood Trend -->
+      <div class="chart-card chart-card-wide">
+        <h3>😊 Mood Trend</h3>
+        <canvas id="mood-chart"></canvas>
+      </div>
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h3>Weekly Consistency</h3><canvas id="weekly-chart"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Completion Rate</h3><canvas id="completion-chart"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Category Breakdown</h3><canvas id="category-chart"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Streak Progress</h3><canvas id="streak-chart"></canvas>
+        </div>
+        <div class="chart-card chart-card-wide">
+          <h3>Monthly Trend</h3><canvas id="monthly-chart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== JOURNAL VIEW ===== -->
+    <section id="view-journal" class="view">
+      <div class="view-header">
+        <h2>Daily Journal</h2>
+        <button id="new-journal-btn" class="btn-primary">+ New Entry</button>
+      </div>
+      <div class="journal-editor" id="journal-editor" style="display:none;">
+        <div class="journal-editor-header">
+          <input type="date" id="journal-date" />
+          <select id="journal-mood" class="sort-select">
+            <option value="">Select mood...</option>
+            <option value="amazing">😄 Amazing</option>
+            <option value="good">🙂 Good</option>
+            <option value="okay">😐 Okay</option>
+            <option value="bad">😔 Bad</option>
+            <option value="awful">😢 Awful</option>
+          </select>
+        </div>
+        <textarea id="journal-text" placeholder="How was your day? What did you accomplish? What are you grateful for?"
+          rows="5"></textarea>
+        <div class="journal-editor-footer">
+          <button id="journal-cancel" class="btn-outline">Cancel</button>
+          <button id="journal-save" class="btn-primary">Save Entry</button>
+        </div>
+      </div>
+      <div id="journal-entries" class="journal-entries-list"></div>
+    </section>
+
+    <!-- ===== FOCUS TIMER VIEW ===== -->
+    <section id="view-timer" class="view">
+      <div class="view-header">
+        <h2>Focus Timer</h2>
+      </div>
+      <div class="timer-container">
+        <div class="timer-mode-tabs">
+          <button class="timer-mode-btn active" data-mode="focus">Focus</button>
+          <button class="timer-mode-btn" data-mode="short">Short Break</button>
+          <button class="timer-mode-btn" data-mode="long">Long Break</button>
+        </div>
+        <div class="timer-display">
+          <svg class="timer-ring" viewBox="0 0 200 200">
+            <circle class="timer-ring-bg" cx="100" cy="100" r="90" />
+            <circle class="timer-ring-fill" id="timer-ring-fill" cx="100" cy="100" r="90" />
+          </svg>
+          <div class="timer-time" id="timer-time">25:00</div>
+        </div>
+        <div class="timer-label" id="timer-label">Focus Time</div>
+        <div class="timer-controls">
+          <button id="timer-start" class="btn-primary timer-btn">▶ Start</button>
+          <button id="timer-pause" class="btn-outline timer-btn" style="display:none;">⏸ Pause</button>
+          <button id="timer-reset" class="btn-ghost timer-btn">↺ Reset</button>
+        </div>
+        <div class="timer-sessions">
+          <span id="timer-session-count">0</span> sessions completed today
+        </div>
+        <div class="timer-habit-select">
+          <label>Link to a habit:</label>
+          <select id="timer-habit" class="sort-select">
+            <option value="">None</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ACHIEVEMENTS VIEW ===== -->
+    <section id="view-achievements" class="view">
+      <div class="view-header">
+        <h2>Achievements</h2>
+        <p class="view-subtitle" id="achievements-count">0 / 0 Unlocked</p>
+      </div>
+      <div id="achievements-grid" class="achievements-grid"></div>
+    </section>
+
+    <!-- ===== SETTINGS VIEW ===== -->
+    <section id="view-settings" class="view">
+      <div class="view-header">
+        <h2>Settings</h2>
+      </div>
+      <div class="settings-list">
+        <div class="settings-group">
+          <h3>Profile</h3>
+          <div class="setting-item">
+            <div class="setting-info"><span class="setting-label">Display Name</span></div>
+            <input type="text" id="setting-name" class="setting-input" placeholder="Your name" maxlength="30" />
+          </div>
+        </div>
+        <div class="settings-group">
+          <h3>Appearance</h3>
+          <div class="setting-item">
+            <div class="setting-info"><span class="setting-label">Dark Mode</span><span class="setting-desc">Switch
+                between light and dark themes</span></div>
+            <label class="toggle-switch"><input type="checkbox" id="setting-darkmode" /><span
+                class="toggle-slider"></span></label>
+          </div>
+        </div>
+        <div class="settings-group">
+          <h3>Notifications</h3>
+          <div class="setting-item">
+            <div class="setting-info"><span class="setting-label">Browser Notifications</span><span
+                class="setting-desc">Get reminded about your habits</span></div>
+            <label class="toggle-switch"><input type="checkbox" id="setting-notifications" /><span
+                class="toggle-slider"></span></label>
+          </div>
+          <div class="setting-item">
+            <div class="setting-info"><span class="setting-label">Sound Effects</span><span class="setting-desc">Play
+                sounds on check-in & achievements</span></div>
+            <label class="toggle-switch"><input type="checkbox" id="setting-sounds" checked /><span
+                class="toggle-slider"></span></label>
+          </div>
+        </div>
+        <div class="settings-group">
+          <h3>Streak</h3>
+          <div class="setting-item">
+            <div class="setting-info"><span class="setting-label">Streak Freezes</span><span
+                class="setting-desc">Remaining: <strong id="freeze-count">2</strong> (miss a day without breaking
+                streak)</span></div>
+            <button id="use-freeze" class="btn-outline btn-sm">Use Freeze</button>
+          </div>
+        </div>
+        <div class="settings-group">
+          <h3>Data Management</h3>
+          <div class="setting-item">
+            <div class="setting-info"><span class="setting-label">Export Data</span><span class="setting-desc">Full JSON
+                backup</span></div>
+            <button id="export-data" class="btn-primary btn-sm">Export</button>
+          </div>
+          <div class="setting-item">
+            <div class="setting-info"><span class="setting-label">Import Data</span><span class="setting-desc">Restore
+                from backup</span></div>
+            <label for="import-data" class="btn-primary btn-sm" style="cursor:pointer;">Import</label>
+            <input type="file" id="import-data" accept=".json" style="display:none;" />
+          </div>
+          <div class="setting-item">
+            <div class="setting-info"><span class="setting-label">Reset All Data</span><span
+                class="setting-desc">Permanently delete everything</span></div>
+            <button id="clear-data" class="btn-danger btn-sm">Reset</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>Created by <strong>Mephisto X</strong> ~ Student | Licensed under D&M Company</p>
+    </footer>
+  </div>
+
+  <!-- ===== MOBILE BOTTOM NAV ===== -->
+  <nav class="bottom-nav" id="bottom-nav">
+    <button class="bottom-nav-item active" data-view="dashboard"><span>📊</span><small>Home</small></button>
+    <button class="bottom-nav-item" data-view="habits"><span>✅</span><small>Habits</small></button>
+    <button class="bottom-nav-item bottom-nav-add" id="bottom-add-btn"><span>+</span></button>
+    <button class="bottom-nav-item" data-view="timer"><span>⏱️</span><small>Timer</small></button>
+    <button class="bottom-nav-item" data-view="analytics"><span>📈</span><small>Stats</small></button>
+  </nav>
+
+  <!-- ===== HABIT DETAIL MODAL ===== -->
+  <div id="habit-detail-modal" class="modal-overlay">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h2 id="detail-title">Habit Details</h2>
+        <button id="detail-close" class="modal-close-btn">✕</button>
+      </div>
+      <div class="modal-body" id="detail-body"></div>
     </div>
-  </main>
+  </div>
 
-  <footer>
-    <p>Created by Mephisto X ~ Student | Licensed under D&M Company</p>
-  </footer>
+  <!-- ===== ADD/EDIT HABIT MODAL ===== -->
+  <div id="habit-modal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modal-title">New Habit</h2>
+        <button id="modal-close" class="modal-close-btn">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Emoji</label>
+          <div class="emoji-picker" id="emoji-picker">
+            <button class="emoji-option selected" data-emoji="💪">💪</button>
+            <button class="emoji-option" data-emoji="📚">📚</button>
+            <button class="emoji-option" data-emoji="🏃">🏃</button>
+            <button class="emoji-option" data-emoji="💧">💧</button>
+            <button class="emoji-option" data-emoji="🧘">🧘</button>
+            <button class="emoji-option" data-emoji="🎨">🎨</button>
+            <button class="emoji-option" data-emoji="💻">💻</button>
+            <button class="emoji-option" data-emoji="🎵">🎵</button>
+            <button class="emoji-option" data-emoji="🍎">🍎</button>
+            <button class="emoji-option" data-emoji="😴">😴</button>
+            <button class="emoji-option" data-emoji="🧹">🧹</button>
+            <button class="emoji-option" data-emoji="💰">💰</button>
+            <button class="emoji-option" data-emoji="✍️">✍️</button>
+            <button class="emoji-option" data-emoji="🔬">🔬</button>
+            <button class="emoji-option" data-emoji="🌱">🌱</button>
+            <button class="emoji-option" data-emoji="🏋️">🏋️</button>
+            <button class="emoji-option" data-emoji="🚶">🚶</button>
+            <button class="emoji-option" data-emoji="🥗">🥗</button>
+            <button class="emoji-option" data-emoji="💊">💊</button>
+            <button class="emoji-option" data-emoji="🧠">🧠</button>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="habit-name">Habit Name</label>
+            <input type="text" id="habit-name" placeholder="e.g., Morning Run" maxlength="50" />
+          </div>
+          <div class="form-group">
+            <label>Color</label>
+            <div class="color-picker" id="color-picker">
+              <button class="color-option selected" data-color="#6c5ce7" style="background:#6c5ce7;"></button>
+              <button class="color-option" data-color="#00b894" style="background:#00b894;"></button>
+              <button class="color-option" data-color="#e17055" style="background:#e17055;"></button>
+              <button class="color-option" data-color="#0984e3" style="background:#0984e3;"></button>
+              <button class="color-option" data-color="#fdcb6e" style="background:#fdcb6e;"></button>
+              <button class="color-option" data-color="#e84393" style="background:#e84393;"></button>
+              <button class="color-option" data-color="#00cec9" style="background:#00cec9;"></button>
+              <button class="color-option" data-color="#fd79a8" style="background:#fd79a8;"></button>
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="habit-category">Category</label>
+            <input type="text" id="habit-category" placeholder="e.g., Fitness, Health" />
+          </div>
+          <div class="form-group">
+            <label for="habit-difficulty">Difficulty</label>
+            <select id="habit-difficulty">
+              <option value="Easy">Easy</option>
+              <option value="Medium" selected>Medium</option>
+              <option value="Hard">Hard</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="habit-frequency">Frequency</label>
+          <select id="habit-frequency">
+            <option value="daily">Every Day</option>
+            <option value="weekdays">Weekdays Only</option>
+            <option value="weekends">Weekends Only</option>
+            <option value="custom">Custom Days</option>
+          </select>
+          <div class="custom-days" id="custom-days" style="display:none;">
+            <label class="day-check"><input type="checkbox" value="0" /><span>Sun</span></label>
+            <label class="day-check"><input type="checkbox" value="1" /><span>Mon</span></label>
+            <label class="day-check"><input type="checkbox" value="2" /><span>Tue</span></label>
+            <label class="day-check"><input type="checkbox" value="3" /><span>Wed</span></label>
+            <label class="day-check"><input type="checkbox" value="4" /><span>Thu</span></label>
+            <label class="day-check"><input type="checkbox" value="5" /><span>Fri</span></label>
+            <label class="day-check"><input type="checkbox" value="6" /><span>Sat</span></label>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group flex-1"><label for="habit-goal">Daily Goal</label><input type="number" id="habit-goal"
+              min="1" max="20" value="1" /></div>
+          <div class="form-group flex-1"><label for="habit-reminder">Reminder</label><input type="time"
+              id="habit-reminder" /></div>
+        </div>
+        <div class="form-group">
+          <label>Priority</label>
+          <div class="priority-picker" id="priority-picker">
+            <button class="priority-option" data-priority="low">Low</button>
+            <button class="priority-option selected" data-priority="medium">Medium</button>
+            <button class="priority-option" data-priority="high">High</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="habit-notes">Notes</label>
+          <textarea id="habit-notes" placeholder="Add motivation or instructions..." rows="2"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="modal-cancel" class="btn-outline">Cancel</button>
+        <button id="modal-save" class="btn-primary">Create Habit</button>
+      </div>
+    </div>
+  </div>
 
   <script type="module" src="js/main.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js')
-        .then(reg => console.log('Service Worker Registered', reg))
-        .catch(err => console.error('Service Worker Failed', err));
+        .then(reg => console.log('SW Registered', reg))
+        .catch(err => console.error('SW Failed', err));
     }
   </script>
 </body>
+
 </html>
